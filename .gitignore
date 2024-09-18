@@ -1,0 +1,19 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/Financial.CashFlow.API/DesignTimeBuild
+/.vs/Financial.CashFlow.API/FileContentIndex
+/.vs/Financial.CashFlow.API/v17
+/.vs/ProjectEvaluation
+/Financeiro.CashFlow.Business/bin/Debug/net8.0
+/Financeiro.CashFlow.Business/obj
+/Financeiro.CashFlow.DataModels/bin/Debug/net8.0
+/Financeiro.CashFlow.DataModels/obj
+/Financeiro.CashFlow.Server/bin/Debug/net8.0
+/Financeiro.CashFlow.Server/obj
+/.vs/Financial.CashFlow.API/config
+/Financial.CashFlow.API/bin/Debug/net8.0
+/Financial.CashFlow.API/obj
+/Financial.CashFlow.Sdk/bin/Debug/net8.0
+/Financial.CashFlow.Sdk/obj
