@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "Financeiro.CashFlow.Server";
+
+// Definição de mensagens para o serviço de Controle de Lançamentos
+message LancamentoRequest {
+  string id = 1; // ID do lançamento (opcional, pode ser gerado no servidor)
+  string tipo = 2; // Tipo do lançamento: "debito" ou "credito"
+  double valor = 3; // Valor do lançamento
+  string descricao = 4; // Descrição do lançamento
+  string data = 5; // Data do lançamento (ex.: "2024-09-14T00:00:00Z")
+  string clienteId = 6; // ID do cliente associado ao lançamento
+}
+
+message LancamentoResponse {
+  string id = 1; // ID do lançamento criado ou atualizado
+  bool sucesso = 2; // Indica se o lançamento foi realizado com sucesso
+  string mensagem = 3; // Mensagem de erro ou sucesso
+}
+
+message LancamentoIdRequest {
+  string id = 1; // ID do lançamento a ser deletado ou consultado
+}
+
+message DeletarLancamentoResponse {
+  bool sucesso = 1; // Indica se o lançamento foi deletado com sucesso
+  string mensagem = 2; // Mensagem de erro ou sucesso
+}
+
+// Serviço para controle de lançamentos (Comandos)
+service LancamentoService {
+  // Registrar um novo lançamento (débito ou crédito)
+  rpc RegistrarLancamento (LancamentoRequest) returns (LancamentoResponse);
+
+  // Atualizar um lançamento existente
+  rpc AtualizarLancamento (LancamentoRequest) returns (LancamentoResponse);
+
+  // Deletar um lançamento por ID
+  rpc DeletarLancamento (LancamentoIdRequest) returns (DeletarLancamentoResponse);
+}
+
