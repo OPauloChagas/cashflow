@@ -1,48 +1,58 @@
 ﻿using Financeiro.CashFlow.Business.Commands;
 using Financeiro.CashFlow.DataModels.Data;
 using Financeiro.CashFlow.Server;
+using Financial.CashFlow.Sdk;
+using Grpc.Core;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Financeiro.CashFlow.Business.CommandHandlers
 {
     public class AtualizarLancamentoCommandHandler : IRequestHandler<AtualizarLancamentoCommand, LancamentoResponse>
     {
-        private readonly LancamentoAppDbContext _context;
-        public AtualizarLancamentoCommandHandler(LancamentoAppDbContext context) => _context = context;
+        private readonly ILauchClient _lauchClient;
+        private readonly ILogger<AtualizarLancamentoCommandHandler> _logger;
+
+        public AtualizarLancamentoCommandHandler(ILauchClient lauchClient
+                                      , ILogger<AtualizarLancamentoCommandHandler> logger)
+        {
+            _lauchClient = lauchClient;
+            _logger = logger;
+        }
         public async Task<LancamentoResponse> Handle(AtualizarLancamentoCommand request, CancellationToken cancellationToken)
         {
-            var lancamento = await _context.Lancamentos
-                                    .AsNoTracking()
-                                    .FirstOrDefaultAsync(l => l.Id == request.Id, cancellationToken);
-
-            if (lancamento == null)
+            try
             {
+                var lancamentoAtualizar = new LancamentoRequest
+                {
+                    Id = request.Id.ToString(),
+                    Tipo = request.Tipo,
+                    Valor = request.Valor,
+                    Descricao = request.Descricao,
+                    Data = request.Data,
+                    ClienteId = request.ClienteId
+                };
+
+                var grpcAtualizar = await _lauchClient.AtualizarLancamentoAsync(lancamentoAtualizar, cancellationToken);
+
                 return new LancamentoResponse
                 {
-                    Sucesso = false,
-                    Mensagem = "Lançamento não encontrado"
+                    Id = grpcAtualizar.Id.ToString(),
+                    Sucesso = true,
+                    Mensagem = "Lançamento atualizado com sucesso"
                 };
             }
-
-            var lancamentoAtualizado = lancamento with
+            catch (RpcException rpcEx)
             {
-                Tipo = request.Tipo,
-                Valor = request.Valor,
-                Descricao = request.Descricao,
-                Data = request.Data,
-                ClienteId = request.ClienteId
-            };
-
-            _context.Lancamentos.Update(lancamentoAtualizado);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new LancamentoResponse
+                _logger.LogError(rpcEx, "Erro na comunicação com o serviço gRPC: {Message}", rpcEx.Message);
+                throw new ApplicationException("Erro ao comunicar com o serviço gRPC", rpcEx);
+            }
+            catch (Exception ex)
             {
-                Id = lancamentoAtualizado.Id.ToString(),
-                Sucesso = true,
-                Mensagem = "Lançamento atualizado com sucesso"
-            };
+                _logger.LogError(ex, "Erro inesperado ao atualizar lançamento: {Message}", ex.Message);
+                throw;
+            }
         }
     }
 }

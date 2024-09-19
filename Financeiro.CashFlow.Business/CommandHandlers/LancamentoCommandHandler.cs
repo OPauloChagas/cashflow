@@ -1,6 +1,4 @@
 ﻿using Financeiro.CashFlow.Business.Commands;
-using Financeiro.CashFlow.DataModels;
-using Financeiro.CashFlow.DataModels.Data;
 using Financeiro.CashFlow.Server;
 using Financial.CashFlow.Sdk;
 using Grpc.Core;

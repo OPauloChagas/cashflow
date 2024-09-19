@@ -1,38 +1,49 @@
 ﻿using Financeiro.CashFlow.Business.Commands;
 using Financeiro.CashFlow.DataModels.Data;
 using Financeiro.CashFlow.Server;
+using Financial.CashFlow.Sdk;
+using Grpc.Core;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Financeiro.CashFlow.Business.CommandHandlers
 {
     public class DeletarLancamentoCommandHandler : IRequestHandler<DeletarLancamentoCommand, DeletarLancamentoResponse>
     {
-        private readonly LancamentoAppDbContext _context;
-        public DeletarLancamentoCommandHandler(LancamentoAppDbContext context) => _context = context;        
+        private readonly ILauchClient _lauchClient;
+        private readonly ILogger<DeletarLancamentoCommandHandler> _logger;
+
+        public DeletarLancamentoCommandHandler(ILauchClient lauchClient
+                                      , ILogger<DeletarLancamentoCommandHandler> logger)
+        {
+            _lauchClient = lauchClient;
+            _logger = logger;
+        }
         public async Task<DeletarLancamentoResponse> Handle(DeletarLancamentoCommand request, CancellationToken cancellationToken)
         {
-            var lancamento = await _context.Lancamentos
-                                     .AsNoTracking()
-                                     .FirstOrDefaultAsync(l => l.Id == request.Id, cancellationToken);
-
-            if (lancamento == null)
+            try
             {
+
+                var grpRequestExcluir = new LancamentoIdRequest{ Id = request.Id.ToString() };
+                var grpcExcluir = await _lauchClient.DeletarLancamentoAsync(grpRequestExcluir, cancellationToken);
+
                 return new DeletarLancamentoResponse
                 {
-                    Sucesso = false,
-                    Mensagem = "Lançamento não encontrado"
+                    Sucesso = grpcExcluir.Sucesso,
+                    Mensagem = grpcExcluir.Mensagem
                 };
             }
-
-            _context.Lancamentos.Remove(lancamento);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new DeletarLancamentoResponse
+            catch (RpcException rpcEx)
             {
-                Sucesso = true,
-                Mensagem = "Lançamento deletado com sucesso"
-            };
+                _logger.LogError(rpcEx, "Erro na comunicação com o serviço gRPC: {Message}", rpcEx.Message);
+                throw new ApplicationException("Erro ao comunicar com o serviço gRPC", rpcEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro inesperado ao excluir lançamento: {Message}", ex.Message);
+                throw;
+            }
         }
     }
 

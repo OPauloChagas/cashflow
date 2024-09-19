@@ -17,12 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Financeiro.CashFlow.DataModels\Financeiro.CashFlow.DataModels.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<Protobuf Include="..\Financeiro.CashFlow.Server\Protos\cash.proto" GrpcService="Client" />
-		<Protobuf Include="..\Financeiro.CashFlow.Server\Protos\greet.proto" GrpcService="Client" />
 	</ItemGroup>
 
 </Project>

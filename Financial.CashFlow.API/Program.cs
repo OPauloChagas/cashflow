@@ -8,9 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Adiciona os controladores (Web API)
 builder.Services.AddControllers();
 
+
 // Configuração de DbContext com InMemory
 builder.Services.AddDbContext<LancamentoAppDbContext>(options =>
     options.UseInMemoryDatabase("LancamentoDb"));
+
 
 // Configuração do MediatR para os Command Handlers
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
