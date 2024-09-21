@@ -6,22 +6,23 @@ namespace Financial.CashFlow.Sdk
 {
     public class LauchClient : ILauchClient
     {
+        #region Dependencies
+
         private readonly LancamentoService.LancamentoServiceClient _lancamentoClient;
         private readonly ILogger<LauchClient> _logger;
 
-        // Construtor para injetar o cliente gRPC e o logger
         public LauchClient(LancamentoService.LancamentoServiceClient lancamentoClient, ILogger<LauchClient> logger)
         {
             _lancamentoClient = lancamentoClient;
             _logger = logger;
         }
 
-        // Método para atualizar o lançamento via gRPC
+        #endregion END Dependencies
+
         public async Task<LancamentoResponse> AtualizarLancamentoAsync(LancamentoRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                // Tenta atualizar via gRPC
                 var response = await _lancamentoClient.AtualizarLancamentoAsync(request, null, null, cancellationToken);
                 return response;
             }
@@ -37,7 +38,6 @@ namespace Financial.CashFlow.Sdk
             }
         }
 
-        // Método para deletar o lançamento via gRPC
         public async Task<DeletarLancamentoResponse> DeletarLancamentoAsync(LancamentoIdRequest request, CancellationToken cancellationToken)
         {
             try
@@ -58,12 +58,10 @@ namespace Financial.CashFlow.Sdk
             }
         }
 
-        // Método para registrar o lançamento via gRPC
         public async Task<LancamentoResponse> RegistrarLancamentoAsync(LancamentoRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                // Tenta registrar via gRPC
                 var response = await _lancamentoClient.RegistrarLancamentoAsync(request, null, null, cancellationToken);
                 return response;
             }
@@ -79,6 +77,5 @@ namespace Financial.CashFlow.Sdk
             }
         }
     }
-
 
 }

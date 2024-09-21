@@ -38,7 +38,7 @@ namespace Financeiro.CashFlow.Server.Services
                 // Retorna a resposta de sucesso
                 return new LancamentoResponse
                 {
-                    Id = "1", //lancamento.Id.ToString(),
+                    Id = lancamento.Id.ToString(),
                     Sucesso = true,
                     Mensagem = "Lançamento registrado com sucesso!"
                 };

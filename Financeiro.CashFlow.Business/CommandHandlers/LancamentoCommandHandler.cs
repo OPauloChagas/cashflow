@@ -9,6 +9,8 @@ namespace Financeiro.CashFlow.Business.CommandHandlers
 {
     public class LancamentoCommandHandler : IRequestHandler<LancamentoCommand, LancamentoResponse>
     {
+        #region Dependencies
+
         private readonly ILauchClient _lauchClient;
         private readonly ILogger<LancamentoCommandHandler> _logger;
 
@@ -18,6 +20,9 @@ namespace Financeiro.CashFlow.Business.CommandHandlers
             _lauchClient = lauchClient;
             _logger = logger;
         }
+
+        #endregion END Dependencies
+
         public async Task<LancamentoResponse> Handle(LancamentoCommand request, CancellationToken cancellationToken)
         {
             try
@@ -32,12 +37,9 @@ namespace Financeiro.CashFlow.Business.CommandHandlers
                     Data = request.Data,
                     ClienteId = request.ClienteId
                 };
-
-                // Faz a chamada gRPC usando o LauchClient para registrar o lançamento
+                
                 var grpcResponse = await _lauchClient.RegistrarLancamentoAsync(grpcRequest, cancellationToken);
 
-
-                // Retorna a resposta do gRPC como resultado do CommandHandler
                 return new LancamentoResponse
                 {
                     Id = grpcResponse.Id,

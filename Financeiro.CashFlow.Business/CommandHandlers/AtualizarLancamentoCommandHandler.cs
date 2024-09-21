@@ -1,16 +1,16 @@
 ﻿using Financeiro.CashFlow.Business.Commands;
-using Financeiro.CashFlow.DataModels.Data;
 using Financeiro.CashFlow.Server;
 using Financial.CashFlow.Sdk;
 using Grpc.Core;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Financeiro.CashFlow.Business.CommandHandlers
 {
     public class AtualizarLancamentoCommandHandler : IRequestHandler<AtualizarLancamentoCommand, LancamentoResponse>
     {
+        #region Dependencies
+
         private readonly ILauchClient _lauchClient;
         private readonly ILogger<AtualizarLancamentoCommandHandler> _logger;
 
@@ -20,6 +20,9 @@ namespace Financeiro.CashFlow.Business.CommandHandlers
             _lauchClient = lauchClient;
             _logger = logger;
         }
+
+        #endregion END Dependencies
+                
         public async Task<LancamentoResponse> Handle(AtualizarLancamentoCommand request, CancellationToken cancellationToken)
         {
             try

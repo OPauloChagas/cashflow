@@ -11,17 +11,15 @@ namespace Financial.CashFlow.API.Controllers
     public class LancamentoController : ControllerBase
     {
 
-        private readonly LancamentoAppDbContext _context;
         private readonly ISender _sender;
 
-        public LancamentoController(LancamentoAppDbContext context, ISender sender)
+        public LancamentoController(ISender sender)
         {
-            _context = context;
             _sender = sender;
         }
                 
         [HttpPost("create")]
-        public async Task<ActionResult<LancamentoResponse>> CreateLancamento(LancamentoCommand command)
+        public async Task<ActionResult<LancamentoResponse>> CriarLancamento(LancamentoCommand command)
         {
             if (command == null)
             {
@@ -30,7 +28,6 @@ namespace Financial.CashFlow.API.Controllers
 
             try
             {
-                // Envia o comando para o MediatR handler
                 var lancamentoResponse = await _sender.Send(command);
 
                 if (!lancamentoResponse.Sucesso)
@@ -42,25 +39,22 @@ namespace Financial.CashFlow.API.Controllers
             }
             catch (Exception ex)
             {
-                // Tratamento de exceção com retorno de erro 500
                 return StatusCode(500, $"Erro ao criar o lançamento: {ex.Message}");
             }
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<DeletarLancamentoResponse>> DeleteLancamento(Guid id)
+        public async Task<ActionResult<DeletarLancamentoResponse>> DeletarLancamento(Guid id)
         {
             if (id == Guid.Empty)
             {
                 return BadRequest("Id do lançamento não pode ser vazio.");
             }
 
-            // Criar o comando para deletar o lançamento
             var command = new DeletarLancamentoCommand(id);
 
             try
             {
-                // Enviar o comando para o handler via MediatR
                 var result = await _sender.Send(command);
 
                 if (!result.Sucesso)
@@ -72,7 +66,6 @@ namespace Financial.CashFlow.API.Controllers
             }
             catch (Exception ex)
             {
-                // Caso uma exceção seja lançada, retornamos erro 500
                 return StatusCode(500, $"Erro ao deletar o lançamento: {ex.Message}");
             }
         }
@@ -85,7 +78,6 @@ namespace Financial.CashFlow.API.Controllers
                 return BadRequest("O ID na URL não corresponde ao ID do comando.");
             }
 
-            // Enviar o comando para o handler via MediatR
             var result = await _sender.Send(command);
 
             if (!result.Sucesso)
