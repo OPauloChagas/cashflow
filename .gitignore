@@ -17,3 +17,5 @@
 /Financial.CashFlow.API/obj
 /Financial.CashFlow.Sdk/bin/Debug/net8.0
 /Financial.CashFlow.Sdk/obj
+/Financial.Cashflow.Tests/bin/Debug/net8.0
+/Financial.Cashflow.Tests/obj
