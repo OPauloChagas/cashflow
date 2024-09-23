@@ -1,5 +1,4 @@
 ﻿using Financeiro.CashFlow.Business.Commands;
-using Financeiro.CashFlow.DataModels.Data;
 using Financeiro.CashFlow.Server;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

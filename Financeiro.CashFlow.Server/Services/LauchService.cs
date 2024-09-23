@@ -22,7 +22,7 @@ namespace Financeiro.CashFlow.Server.Services
         {
             try
             {
-                // Cria um novo lançamento
+
                 var lancamento = new LancamentoDataModel
                 {
                     Id = Guid.Parse(request.Id),
@@ -36,7 +36,7 @@ namespace Financeiro.CashFlow.Server.Services
                 _context.Lancamentos.Add(lancamento);
                 await _context.SaveChangesAsync();
 
-                // Retorna a resposta de sucesso
+
                 return new LancamentoResponse
                 {
                     Id = lancamento.Id.ToString(),
@@ -46,10 +46,7 @@ namespace Financeiro.CashFlow.Server.Services
             }
             catch (Exception ex)
             {
-                // Logar a exceção para facilitar o diagnóstico
                 _logger.LogError(ex, "Erro ao registrar lançamento: {Message}", ex.Message);
-
-                // Retornar uma resposta de erro apropriada
                 throw new RpcException(new Status(StatusCode.Internal, $"Erro ao registrar o lançamento: {ex.Message}"));
             }
         }
@@ -71,7 +68,6 @@ namespace Financeiro.CashFlow.Server.Services
                     };
                 }
 
-                // Atualiza os campos do lançamento
                 var lancamentoAtualizado = lancamentoExistente with
                 {
                     Tipo = request.Tipo,
@@ -81,11 +77,9 @@ namespace Financeiro.CashFlow.Server.Services
                     ClienteId = request.ClienteId
                 };
 
-                // Salva as alterações no contexto
                 _context.Lancamentos.Update(lancamentoAtualizado);
                 await _context.SaveChangesAsync();
 
-                // Retorna a resposta de sucesso
                 return new LancamentoResponse
                 {
                     Id = lancamentoExistente.Id.ToString(),
@@ -106,7 +100,7 @@ namespace Financeiro.CashFlow.Server.Services
         {
             try
             {
-                // Tenta buscar o lançamento existente no contexto InMemory
+
                 var lancamentoExistente = await _context.Lancamentos.FindAsync(Guid.Parse(request.Id));
 
                 if (lancamentoExistente == null)
@@ -118,11 +112,9 @@ namespace Financeiro.CashFlow.Server.Services
                     };
                 }
 
-                // Remove o lançamento
                 _context.Lancamentos.Remove(lancamentoExistente);
                 await _context.SaveChangesAsync();
 
-                // Retorna a resposta de sucesso
                 return new DeletarLancamentoResponse
                 {
                     Sucesso = true,
@@ -132,11 +124,8 @@ namespace Financeiro.CashFlow.Server.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao deletar lançamento: {Message}", ex.Message);
-
-                // Retorna uma resposta de erro apropriada
                 throw new RpcException(new Status(StatusCode.Internal, $"Erro ao deletar o lançamento: {ex.Message}"));
             }
         }
-
     }
 }

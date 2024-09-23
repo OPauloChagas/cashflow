@@ -6,11 +6,11 @@ option csharp_namespace = "Financeiro.CashFlow.Server";
 
 // Definição de mensagens para o serviço de Controle de Lançamentos
 message LancamentoRequest {
-  string id = 1; // ID do lançamento (opcional, pode ser gerado no servidor)
+  string id = 1; // ID do lançamento 
   string tipo = 2; // Tipo do lançamento: "debito" ou "credito"
   double valor = 3; // Valor do lançamento
   string descricao = 4; // Descrição do lançamento
-  string data = 5; // Data do lançamento (ex.: "2024-09-14T00:00:00Z")
+  string data = 5; // Data do lançamento 
   string clienteId = 6; // ID do cliente associado ao lançamento
 }
 

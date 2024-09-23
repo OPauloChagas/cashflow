@@ -31,7 +31,7 @@ namespace Financeiro.CashFlow.Business.CommandHandlers
         {
             try
             {
-                // Mapeia o comando para o gRPC LancamentoRequest
+                
                 var grpcRequest = new LancamentoRequest
                 {
                     Id = request.Id.ToString(),

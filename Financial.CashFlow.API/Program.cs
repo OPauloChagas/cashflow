@@ -19,7 +19,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<LancamentoAppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("PostgresConnection"),
-        npgsqlOptions => npgsqlOptions.MigrationsAssembly("Financeiro.CashFlow.DataModels") // Nome correto do projeto que contém o DbContext
+        npgsqlOptions => npgsqlOptions.MigrationsAssembly("Financeiro.CashFlow.DataModels") 
     )
 );
 
@@ -44,11 +44,8 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
 builder.Services.AddSingleton<RabbitMQPublisher>();
 builder.Services.AddSingleton<RabbitMQConsumer>();
 
-// Configuração do gRPC através do SDK
 builder.Services.AddGrpcSdk();
-
-// **Adiciona os serviços gRPC (falta no código anterior)**
-builder.Services.AddGrpc(); // Isso é necessário para que o gRPC funcione
+builder.Services.AddGrpc();
 
 // Swagger/OpenAPI para documentação
 builder.Services.AddEndpointsApiExplorer();
@@ -62,11 +59,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(builder =>
+    builder.WithOrigins("http://localhost:3000")
+           .AllowAnyMethod()
+           .AllowAnyHeader());
+
 //Migration
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<LancamentoAppDbContext>();
-    dbContext.Database.Migrate(); 
+    dbContext.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
