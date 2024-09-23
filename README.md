@@ -1,84 +1,149 @@
-# Testes Unitários para LancamentoController, CommandHandlers e gRPC
+# **Financial Cash Flow System**
 
-## Descrição
+## **Sumário**
+- [Visão Geral do Projeto](#visão-geral-do-projeto)
+- [Decisões Arquiteturais (ADR)](#decisões-arquiteturais-adr)
+- [Arquitetura](#arquitetura)
+- [Requisitos](#requisitos)
+- [Instalação e Configuração](#instalação-e-configuração)
+- [Rodando o Sistema](#rodando-o-sistema)
+  - [Executar Localmente](#executar-localmente)
+  - [Executar com Docker](#executar-com-docker)
+- [Testes Unitários](#testes-unitários)
+- [Sugestões de implementação futura](#Sugestões-Futuras-de-Implementação)
 
-Este repositório contém os testes unitários do **LancamentoController**, **CommandHandlers**, e interações com serviços **gRPC** no contexto de um sistema de controle de lançamentos financeiros. Os testes foram desenvolvidos utilizando o **xUnit** como framework de testes e **Moq** para a criação de mocks e simulação de dependências.
+## **Visão Geral do Projeto**
 
-## Objetivo
+A solução implementada é uma arquitetura escalável e resiliente, projetada para gerenciar o controle de lançamentos financeiros e consolidar relatórios diários.
 
-O objetivo deste conjunto de testes é garantir que as funcionalidades de criação, atualização, e exclusão de lançamentos estejam funcionando corretamente, tanto em termos de lógica de negócio quanto na comunicação com o serviço gRPC. Os testes cobrem cenários de sucesso, falha, e tratamento de exceções.
+### Principais Contribuições:
 
-## Estrutura dos Testes
+- **Arquitetura Baseada em Microserviços**: A aplicação foi estruturada em microserviços, permitindo uma escalabilidade independente e a possibilidade de realizar atualizações sem impactar todo o sistema. Isso garante que cada componente possa evoluir de forma isolada.
 
-### 1. Testes do LancamentoController
+- **Uso de Tecnologias Modernas**:
+  - **.NET Core**: Utilizado para o desenvolvimento das APIs, oferecendo alta performance e suporte a padrões modernos de programação.
+  - **gRPC**: Implementado para comunicação eficiente entre os microserviços, proporcionando baixa latência e alta performance nas chamadas de API.
+  - **RabbitMQ**: Integrado para mensageria assíncrona, permitindo que os serviços se comuniquem de forma desacoplada e resiliente.
+  - **PostgreSQL e MongoDB**: Utilizados para persistência de dados, garantindo tanto a consistência transacional quanto a flexibilidade em consultas de leitura.
 
-Os testes para o `LancamentoController` verificam o comportamento dos endpoints da API para criar, atualizar, e deletar lançamentos.
+- **Implementação de CQRS**: A arquitetura foi desenhada seguindo o padrão **Command Query Responsibility Segregation (CQRS)**, que separa as operações de leitura e escrita. Isso melhora a escalabilidade e a performance, permitindo otimizações específicas para cada tipo de operação.
 
-- **Método CriarLancamento**:
-  - Verifica se o lançamento é criado com sucesso.
-  - Lida com comandos de lançamento nulos e lança `BadRequest` se o comando for inválido.
-  - Verifica o retorno de erros inesperados com status `500` (Internal Server Error).
+- **Testes Automatizados**: Foram desenvolvidos testes unitários robustos para garantir a integridade e o correto funcionamento das funcionalidades implementadas, incluindo testes para controladores, command handlers e interações com gRPC.
 
-- **Método DeletarLancamento**:
-  - Verifica o comportamento quando um lançamento é deletado com sucesso.
-  - Lança `BadRequest` se o ID fornecido for vazio ou inválido.
-  - Retorna `NotFound` se o lançamento não for encontrado.
-  - Captura e trata exceções de sistema, retornando erro `500`.
+### Alinhamento com o Desafio Proposto
 
-- **Método AtualizarLancamento**:
-  - Verifica se o lançamento é atualizado corretamente.
-  - Lança `BadRequest` se o ID da URL não corresponder ao ID do comando.
-  - Retorna `NotFound` se o lançamento não for encontrado para atualização.
-  - Captura exceções inesperadas e retorna `500`.
+O projeto atende aos requisitos do desafio ao proporcionar uma solução que não só atende às necessidades imediatas de controle de lançamentos financeiros, mas também é escalável, resiliente e segura. As decisões arquiteturais tomadas garantem que o sistema possa lidar com um alto volume de transações e consultas, especialmente em momentos de pico, sem comprometer a performance ou a integridade dos dados.
 
-### 2. Testes dos CommandHandlers
+## **Decisões Arquiteturais (ADR)**
 
-Os command handlers tratam a lógica de negócios relacionada a criação, atualização, e exclusão de lançamentos. Os testes garantem que os handlers estão interagindo corretamente com o serviço gRPC.
+### ADR: Arquitetura de Microsserviços com CQRS e gRPC
 
-- **DeletarLancamentoCommandHandler**:
-  - Verifica se o lançamento é deletado com sucesso através do serviço gRPC.
-  - Testa a captura de `RpcException` (exceção de comunicação com gRPC) e a subsequente propagação de `ApplicationException`.
-  - Lida com exceções genéricas inesperadas e garante que o erro é registrado corretamente.
+#### **Contexto**  
+O sistema de fluxo de caixa requer escalabilidade, resiliência e segurança para gerenciar lançamentos financeiros e consolidar relatórios diários.
 
-- **AtualizarLancamentoCommandHandler**:
-  - Garante que o lançamento é atualizado corretamente através do serviço gRPC.
-  - Testa cenários onde o serviço gRPC lança exceções, como `RpcException`, e garante que essas exceções são tratadas e propagadas corretamente.
-  - Verifica a resposta correta para lançamentos não encontrados ou mal formatados.
+#### **Decisão 1: CQRS**  
+**Decisão**: Adotar o padrão CQRS para separar operações de leitura e escrita.  
+**Motivação**: Otimizar a escalabilidade das operações de consulta e escrita.  
+**Consequências**: Maior flexibilidade, porém com complexidade adicional na manutenção dos dois modelos de dados.
 
-### 3. Testes gRPC
+#### **Decisão 2: gRPC**  
+**Decisão**: Usar gRPC para a comunicação entre microsserviços.  
+**Motivação**: gRPC oferece comunicação eficiente e de baixa latência.  
+**Consequências**: Curva de aprendizado maior, mas maior robustez e performance.
 
-Os testes simulam o comportamento do cliente gRPC (`LauchClient`) para garantir que a comunicação entre o sistema e o serviço de lançamentos via gRPC ocorra corretamente.
+#### **Decisão 3: SQL para Escrita e MongoDB para Leitura**  
+**Decisão**: Utilizar SQL para controle de lançamentos e MongoDB para o serviço de relatórios.  
+**Motivação**: Garantir consistência em transações financeiras (SQL) e otimizar a performance de leitura com NoSQL.  
+**Consequências**: Modelo de leitura mais rápido, mas a necessidade de sincronização entre bases.
 
-- **RegistrarLancamentoAsync**:
-  - Testa a comunicação bem-sucedida com o serviço gRPC, garantindo que o lançamento é registrado com sucesso.
-  - Simula falhas no serviço gRPC, como a exceção `RpcException`, e verifica o tratamento e log correto das exceções.
-  
-- **AtualizarLancamentoAsync e DeletarLancamentoAsync**:
-  - Verifica a comunicação para atualização e exclusão de lançamentos, cobrindo tanto o sucesso da operação quanto falhas devido a exceções gRPC.
-  
-## Tecnologias Utilizadas
+#### **Decisão 4: Sincronização via Eventos**  
+**Decisão**: Implementar arquitetura baseada em eventos com RabbitMQ.  
+**Motivação**: Desacoplar os serviços e garantir resiliência em caso de falhas.  
+**Consequências**: Maior resiliência, porém maior complexidade com a gestão de eventos.
 
-- **xUnit**: Framework de testes para realizar asserções e validar o comportamento do código.
-- **Moq**: Biblioteca de mocks para simular dependências como `ISender`, `ILauchClient`, e `ILogger`.
-- **gRPC**: Para comunicação remota com o serviço de controle de lançamentos.
-- **.NET Core**: Plataforma usada para o desenvolvimento da API e dos testes.
+## **Arquitetura**
 
-## Estrutura dos Arquivos de Teste
+A arquitetura é baseada em microserviços com dois componentes principais:
 
-- **LancamentoControllerTests.cs**: Testes para o controller que lida com as operações CRUD de lançamentos.
-- **DeletarLancamentoCommandHandlerTests.cs**: Testes para o handler responsável por deletar lançamentos.
-- **AtualizarLancamentoCommandHandlerTests.cs**: Testes para o handler que lida com a atualização de lançamentos.
-- **LancamentoClientTests.cs**: Testes para o cliente gRPC que se comunica com o serviço de lançamentos.
+- **API de Controle de Lançamentos**: Gerencia os lançamentos financeiros (criação, atualização, exclusão).
+- **API de Consolidação Diária**: Consolida os lançamentos diários e retorna o saldo. Comunicação via gRPC com a API de Lançamentos.
 
-## Como Executar os Testes
+Os microserviços usam **RabbitMQ** para mensageria assíncrona e persistem os dados em **PostgreSQL** e **MongoDB**.
+
+## **Requisitos**
+
+- **Escalabilidade**: A arquitetura permite que os serviços sejam escalados de forma independente.
+- **Resiliência**: O sistema foi desenhado para lidar com falhas e permitir retries automáticos.
+- **Segurança**: Autenticação JWT é utilizada para proteger a API.
+- **Documentação**: A API está documentada com **Swagger**.
+
+## **Instalação e Configuração**
 
 1. Clone o repositório:
-   ```bash
-   git clone https://github.com/OPauloChagas/cashflow.git
-2. Clone o repositório:
-   ```bash
-   cd Financial.CashFlow.Tests
-3. Execute os testes usando o dotnet test:
-  ```bash
-  dotnet test
+``bash
+git clone https://github.com/OPauloChagas/cashflow.git cd cashflow
 
+3. Configure o ambiente:
+- Certifique-se de ter as variáveis de ambiente configuradas para conectar aos serviços de banco de dados e RabbitMQ.
+
+## **Rodando o Sistema**
+
+### **Executar Localmente**
+
+1. Certifique-se de ter o .NET Core instalado.
+2. Compile o projeto:
+
+dotnet build
+
+3. Execute as migrações do banco de dados:
+
+dotnet ef database update
+
+5. Rode a aplicação:
+
+dotnet run
+
+
+### **Executar com Docker**
+
+1. Construa e suba os containers:
+
+docker-compose up --build
+
+
+2. Acesse a aplicação:
+- A API estará disponível em [http://localhost:5000](http://localhost:5000).
+
+## **Testes Unitários**
+
+Este repositório contém testes unitários para garantir o bom funcionamento dos controladores, command handlers e serviços gRPC.
+
+### **Estrutura dos Testes**
+
+1. **Testes do LancamentoController**  
+Verifica o comportamento dos endpoints para criar, atualizar e deletar lançamentos financeiros. Testa cenários de sucesso e falha, garantindo a captura correta de exceções.
+
+2. **Testes dos CommandHandlers**  
+Garantem que a lógica de negócio para criação, atualização e exclusão de lançamentos está sendo processada corretamente, assim como a interação com o serviço gRPC.
+
+3. **Testes gRPC**  
+Simulam a comunicação entre os microsserviços para registrar, atualizar e deletar lançamentos financeiros. Garantem a correta tratativa de exceções como RpcException.
+
+## **Como Executar os Testes**
+
+1. Entre na pasta de testes:
+cd Financial.CashFlow.Tests
+
+cd Financial.CashFlow.Tests
+dotnet test
+
+## **Sugestões Futuras de Implementação**
+
+Embora identificado a importância de implementar as seguintes funcionalidades, essas implementações foram deixadas como sugestões para o futuro devido ao prazo:
+
+- **Autenticação JWT**: Implementação de um sistema seguro de autenticação para proteger as APIs.
+- **Monitoramento e Observabilidade**: Integração de ferramentas como Prometheus e Grafana para monitorar o desempenho do sistema e coletar métricas.
+- **Cache com Redis**: Uso de um sistema de cache distribuído para otimizar consultas frequentes, melhorando a performance durante picos de tráfego.
+- **API Gateway Ocelot:** Para roteamento e gerenciamento de chamadas entre serviços.
+
+Com isso, a solução demonstra não apenas a capacidade técnica de implementar uma arquitetura moderna, mas também um entendimento profundo dos princípios de design de software, essenciais para o sucesso em um ambiente de produção.
