@@ -4,6 +4,7 @@ using Financial.CashFlow.Sdk;
 using Grpc.Core;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Financeiro.CashFlow.Business.CommandHandlers
 {
@@ -13,12 +14,15 @@ namespace Financeiro.CashFlow.Business.CommandHandlers
 
         private readonly ILauchClient _lauchClient;
         private readonly ILogger<LancamentoCommandHandler> _logger;
+        private readonly RabbitMQPublisher _rabbitMQPublisher;
 
         public LancamentoCommandHandler(ILauchClient lauchClient
-                                      , ILogger<LancamentoCommandHandler> logger)
+                                      , ILogger<LancamentoCommandHandler> logger
+                                      , RabbitMQPublisher rabbitMQPublisher)
         {
             _lauchClient = lauchClient;
             _logger = logger;
+            _rabbitMQPublisher = rabbitMQPublisher;
         }
 
         #endregion END Dependencies
@@ -37,8 +41,11 @@ namespace Financeiro.CashFlow.Business.CommandHandlers
                     Data = request.Data,
                     ClienteId = request.ClienteId
                 };
-                
+
                 var grpcResponse = await _lauchClient.RegistrarLancamentoAsync(grpcRequest, cancellationToken);
+
+                var message = JsonConvert.SerializeObject(request);
+                _rabbitMQPublisher.PublishMessage("queue_consolidacao_diaria", message);
 
                 return new LancamentoResponse
                 {

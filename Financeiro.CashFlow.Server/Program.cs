@@ -5,8 +5,16 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuração de DbContext com InMemory
+//builder.Services.AddDbContext<LancamentoAppDbContext>(options =>
+//    options.UseInMemoryDatabase("LancamentoDb"));
+
+// Configura o PostgreSQL no Entity Framework
 builder.Services.AddDbContext<LancamentoAppDbContext>(options =>
-    options.UseInMemoryDatabase("LancamentoDb"));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("PostgresConnection"),
+        npgsqlOptions => npgsqlOptions.MigrationsAssembly("Financeiro.CashFlow.DataModels") // Nome correto do projeto que contém o DbContext
+    )
+);
 
 // Add services to the container.
 builder.Services.AddGrpc();

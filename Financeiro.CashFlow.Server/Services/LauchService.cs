@@ -9,7 +9,8 @@ namespace Financeiro.CashFlow.Server.Services
     public class LauchService : LancamentoService.LancamentoServiceBase
     {
         private readonly LancamentoAppDbContext _context;
-        private readonly ILogger<LauchService> _logger; // Adicionar logger para capturar erros
+        private readonly ILogger<LauchService> _logger;
+        private readonly LancamentoAppDbContext _lancamentoAppDbContext;
 
         public LauchService(LancamentoAppDbContext context, ILogger<LauchService> logger)
         {
@@ -22,16 +23,16 @@ namespace Financeiro.CashFlow.Server.Services
             try
             {
                 // Cria um novo lançamento
-                var lancamento = new LancamentoDataModel(
-                    Guid.Parse(request.Id),
-                    request.Tipo,
-                    request.Valor,
-                    request.Descricao,
-                    request.Data,
-                    request.ClienteId
-                );
+                var lancamento = new LancamentoDataModel
+                {
+                    Id = Guid.Parse(request.Id),
+                    Tipo = request.Tipo,
+                    Valor = request.Valor,
+                    Descricao = request.Descricao,
+                    Data = request.Data,
+                    ClienteId = request.ClienteId
+                };
 
-                // Tenta salvar no contexto InMemory
                 _context.Lancamentos.Add(lancamento);
                 await _context.SaveChangesAsync();
 
@@ -57,7 +58,6 @@ namespace Financeiro.CashFlow.Server.Services
         {
             try
             {
-                // Tenta buscar o lançamento existente no contexto InMemory
                 var lancamentoExistente = await _context.Lancamentos
                                                 .AsNoTracking()
                                                 .FirstOrDefaultAsync(x => x.Id == Guid.Parse(request.Id));

@@ -1,4 +1,5 @@
-﻿using Financeiro.CashFlow.Business.CommandHandlers;
+﻿using Financeiro.CashFlow.Business;
+using Financeiro.CashFlow.Business.CommandHandlers;
 using Financeiro.CashFlow.Business.Commands;
 using Financeiro.CashFlow.Server;
 using Financial.CashFlow.Sdk;
@@ -18,7 +19,9 @@ namespace Financial.Cashflow.Tests
         {
             _mockLogger = new Mock<ILogger<LancamentoCommandHandler>>();
             _mockGrpcClient = new Mock<ILauchClient>();
-            _handler = new LancamentoCommandHandler(_mockGrpcClient.Object, _mockLogger.Object);
+            var mockRabbitMQPublisher = new Mock<RabbitMQPublisher>();
+
+            _handler = new LancamentoCommandHandler(_mockGrpcClient.Object, _mockLogger.Object, mockRabbitMQPublisher.Object);
         }
 
         [Fact]
