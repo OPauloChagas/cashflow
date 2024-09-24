@@ -13,7 +13,7 @@ namespace Financeiro.CashFlow.DataModels.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Host=localhost;Database=lancamentos;Username=postgres;Password=your_password",
+                optionsBuilder.UseNpgsql("Host=localhost;Database=lancamentos;Username=postgres;Password=Hdm9r11@",
                     npgsqlOptions => npgsqlOptions.MigrationsAssembly("Financeiro.CashFlow.DataModels"));
             }
         }

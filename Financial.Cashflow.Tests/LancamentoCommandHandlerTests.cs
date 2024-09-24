@@ -14,14 +14,19 @@ namespace Financial.Cashflow.Tests
         private readonly Mock<ILauchClient> _mockGrpcClient;
         private readonly LancamentoCommandHandler _handler;
         private readonly Mock<ILogger<LancamentoCommandHandler>> _mockLogger;
+        private readonly Mock<RabbitMQPublisher> _mockRabbitMQPublisher;
 
         public LancamentoCommandHandlerTests()
         {
             _mockLogger = new Mock<ILogger<LancamentoCommandHandler>>();
             _mockGrpcClient = new Mock<ILauchClient>();
-            var mockRabbitMQPublisher = new Mock<RabbitMQPublisher>();
+            _mockRabbitMQPublisher = new Mock<RabbitMQPublisher>();
 
-            _handler = new LancamentoCommandHandler(_mockGrpcClient.Object, _mockLogger.Object, mockRabbitMQPublisher.Object);
+            // Configura o mock do RabbitMQPublisher para simular a chamada
+            _mockRabbitMQPublisher.Setup(p => p.PublishMessage(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
+
+            // Configura o handler com as dependências mockadas
+            _handler = new LancamentoCommandHandler(_mockGrpcClient.Object, _mockLogger.Object, _mockRabbitMQPublisher.Object);
         }
 
         [Fact]
@@ -36,6 +41,7 @@ namespace Financial.Cashflow.Tests
                 "2023-09-21",
                 "Cliente123"
             );
+
             var grpcResponse = new LancamentoResponse { Sucesso = true };
 
             _mockGrpcClient.Setup(client => client.RegistrarLancamentoAsync(It.IsAny<LancamentoRequest>(), It.IsAny<CancellationToken>()))
@@ -46,6 +52,7 @@ namespace Financial.Cashflow.Tests
 
             // Assert
             Assert.True(result.Sucesso);
+            _mockRabbitMQPublisher.Verify(p => p.PublishMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]

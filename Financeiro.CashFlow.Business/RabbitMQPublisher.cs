@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Financeiro.CashFlow.Business
 {
-    public class RabbitMQPublisher
+    public class RabbitMQPublisher : IRabbitMQPublisher
     {
         private readonly IConnectionFactory _connectionFactory;
 
@@ -11,7 +11,7 @@ namespace Financeiro.CashFlow.Business
         {
             _connectionFactory = connectionFactory;
         }
-
+        public RabbitMQPublisher() { }
         public void PublishMessage(string queueName, string message)
         {
             using var connection = _connectionFactory.CreateConnection();

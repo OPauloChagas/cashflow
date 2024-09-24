@@ -1,7 +1,10 @@
-﻿namespace Financeiro.CashFlow.DataModels
+﻿using MongoDB.Bson.Serialization.Attributes;
+
+namespace Financeiro.CashFlow.DataModels
 {
     public record LancamentoDataModel
     {
+        [BsonId]
         public Guid Id { get; init; }
         public string? Tipo { get; init; }
         public double Valor { get; init; }

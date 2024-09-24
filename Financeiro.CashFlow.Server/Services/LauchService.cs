@@ -2,6 +2,7 @@
 using Financeiro.CashFlow.DataModels.Data;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 
 namespace Financeiro.CashFlow.Server.Services
