@@ -98,9 +98,10 @@ namespace Financial.Cashflow.Tests
             var result = await _controller.AtualizarLancamento(id, command);
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            Assert.Equal(response, okResult.Value);
+            var okResult = Assert.IsType<OkObjectResult>(result); 
+            Assert.Equal(response.Mensagem, okResult.Value);        
         }
+
 
         [Fact]
         public async Task AtualizarLancamento_IdMismatch_ReturnsBadRequest()
@@ -109,11 +110,11 @@ namespace Financial.Cashflow.Tests
             var id = Guid.NewGuid();
             var command = new AtualizarLancamentoCommand
             (
-                 Guid.NewGuid(),  // Diferente 
+                Guid.NewGuid(), // ID diferente do 'id'
                 "Credito",
-                 200.0,
-                 "Pagamento",
-                 "2024-09-21T00:00:00Z",
+                200.0,
+                "Pagamento",
+                "2024-09-21T00:00:00Z",
                 "Cliente123"
             );
 
@@ -121,9 +122,10 @@ namespace Financial.Cashflow.Tests
             var result = await _controller.AtualizarLancamento(id, command);
 
             // Assert
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
-            Assert.Equal("O ID na URL não corresponde ao ID do comando.", badRequestResult.Value);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("ID na URL não corresponde ao ID no corpo da requisição.", badRequestResult.Value);
         }
+
 
         [Fact]
         public async Task AtualizarLancamento_NotFound_ReturnsNotFound()
@@ -132,23 +134,22 @@ namespace Financial.Cashflow.Tests
             var id = Guid.NewGuid();
             var command = new AtualizarLancamentoCommand
             (
-                 id,
+                id,
                 "Credito",
                 200.0,
-                 "Pagamento",
+                "Pagamento",
                 "2024-09-21T00:00:00Z",
-                 "Cliente123"
+                "Cliente123"
             );
 
-            var response = new LancamentoResponse { Sucesso = false, Mensagem = "Lançamento não encontrado." };
-
-            _mockSender.Setup(s => s.Send(command, It.IsAny<CancellationToken>())).ReturnsAsync(response);
+            _mockSender.Setup(s => s.Send(It.IsAny<AtualizarLancamentoCommand>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync((LancamentoResponse)null);
 
             // Act
             var result = await _controller.AtualizarLancamento(id, command);
 
             // Assert
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result); // Verifica se é um NotFound
             Assert.Equal("Lançamento não encontrado.", notFoundResult.Value);
         }
 
@@ -159,25 +160,26 @@ namespace Financial.Cashflow.Tests
             var id = Guid.NewGuid();
             var command = new AtualizarLancamentoCommand
             (
-                 id,
+                id,
                 "Credito",
                 200.0,
-                 "Pagamento",
+                "Pagamento",
                 "2024-09-21T00:00:00Z",
                 "Cliente123"
             );
 
-            _mockSender.Setup(s => s.Send(command, It.IsAny<CancellationToken>()))
-                       .ThrowsAsync(new Exception("Erro ao atualizar o lançamento"));
+            _mockSender.Setup(s => s.Send(It.IsAny<AtualizarLancamentoCommand>(), It.IsAny<CancellationToken>()))
+                       .ThrowsAsync(new ApplicationException("Erro ao atualizar o lançamento"));
 
             // Act
             var result = await _controller.AtualizarLancamento(id, command);
 
             // Assert
-            var statusCodeResult = Assert.IsType<ObjectResult>(result.Result);
+            var statusCodeResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(500, statusCodeResult.StatusCode);
             Assert.Equal("Erro ao atualizar o lançamento: Erro ao atualizar o lançamento", statusCodeResult.Value);
         }
+
 
 
         [Fact]

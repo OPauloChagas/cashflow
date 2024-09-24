@@ -16,7 +16,7 @@ namespace Financial.CashFlow.API.Controllers
         {
             _sender = sender;
         }
-                
+
         [HttpPost("create")]
         public async Task<ActionResult<LancamentoResponse>> CriarLancamento(LancamentoCommand command)
         {
@@ -70,22 +70,40 @@ namespace Financial.CashFlow.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<LancamentoResponse>> AtualizarLancamento(Guid id, AtualizarLancamentoCommand command)
+        public async Task<ActionResult> AtualizarLancamento(Guid id, AtualizarLancamentoCommand command)
         {
             if (id != command.Id)
             {
-                return BadRequest("O ID na URL não corresponde ao ID do comando.");
+                return BadRequest("ID na URL não corresponde ao ID no corpo da requisição.");
             }
 
-            var result = await _sender.Send(command);
-
-            if (!result.Sucesso)
+            try
             {
-                return NotFound(result.Mensagem);
-            }
+                var result = await _sender.Send(command);
 
-            return Ok(result);
+                if (result == null)
+                {
+                    return NotFound("Lançamento não encontrado.");
+                }
+
+                if (result.Sucesso)
+                {
+                    return Ok(result.Mensagem);
+                }
+
+                return BadRequest("Erro ao atualizar o lançamento.");
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, $"Erro ao atualizar o lançamento: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro inesperado: {ex.Message}");
+            }
         }
+
+
     }
 
 }

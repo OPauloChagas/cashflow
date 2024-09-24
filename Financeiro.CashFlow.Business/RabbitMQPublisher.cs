@@ -12,7 +12,8 @@ namespace Financeiro.CashFlow.Business
             _connectionFactory = connectionFactory;
         }
         public RabbitMQPublisher() { }
-        public void PublishMessage(string queueName, string message)
+
+        public virtual void PublishMessage(string queueName, string message)
         {
             using var connection = _connectionFactory.CreateConnection();
             using var channel = connection.CreateModel();

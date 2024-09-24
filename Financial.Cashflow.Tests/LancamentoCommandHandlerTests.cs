@@ -22,10 +22,10 @@ namespace Financial.Cashflow.Tests
             _mockGrpcClient = new Mock<ILauchClient>();
             _mockRabbitMQPublisher = new Mock<RabbitMQPublisher>();
 
-            // Configura o mock do RabbitMQPublisher para simular a chamada
-            _mockRabbitMQPublisher.Setup(p => p.PublishMessage(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
+            _mockRabbitMQPublisher
+              .Setup(p => p.PublishMessage(It.IsAny<string>(), It.IsAny<string>()))
+              .Verifiable();
 
-            // Configura o handler com as dependências mockadas
             _handler = new LancamentoCommandHandler(_mockGrpcClient.Object, _mockLogger.Object, _mockRabbitMQPublisher.Object);
         }
 
