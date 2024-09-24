@@ -3,6 +3,7 @@
 ## **Sumário**
 - [Visão Geral do Projeto](#visão-geral-do-projeto)
 - [Decisões Arquiteturais (ADR)](#decisões-arquiteturais-adr)
+- [Desenho da Solução](#Desenho-da-Solucao)
 - [Arquitetura](#arquitetura)
 - [Requisitos](#requisitos)
 - [Instalação e Configuração](#instalação-e-configuração)
@@ -61,6 +62,11 @@ O sistema de fluxo de caixa requer escalabilidade, resiliência e segurança par
 **Decisão**: Implementar arquitetura baseada em eventos com RabbitMQ.  
 **Motivação**: Desacoplar os serviços e garantir resiliência em caso de falhas.  
 **Consequências**: Maior resiliência, porém maior complexidade com a gestão de eventos.
+
+## **Desenho da Solução**
+
+![image](https://github.com/user-attachments/assets/b02c59b5-8ac2-4435-8789-b695bd64e2db)
+
 
 ## **Arquitetura**
 
