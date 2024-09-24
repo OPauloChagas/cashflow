@@ -11,6 +11,7 @@
   - [Executar com Docker](#executar-com-docker)
 - [Testes Unitários](#testes-unitários)
 - [Sugestões de implementação futura](#Sugestões-Futuras-de-Implementação)
+- [Visão da Interface - UI](#UI-Sistema)
 
 ## **Visão Geral do Projeto**
 
@@ -79,40 +80,84 @@ Os microserviços usam **RabbitMQ** para mensageria assíncrona e persistem os d
 
 ## **Instalação e Configuração**
 
-1. Clone o repositório:
-``bash
+### **Executar serviços do Docker**
+
+1. Construa e suba os containers:
+
+docker-compose up --build
+
+[Uploading docker-compose.yml…](services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Hdm9r11@
+      POSTGRES_DB: lancamentos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-cashFlow
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-cashFlow
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-cashFlow
+
+networks:
+  app-cashFlow:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  mongo-data:
+)
+
+Serviços de Banco de dados e RabbitMQ
+
+### **Executar serviços do .NET**
+
+1. Clone o repositório - API Lançamento de Dados:
+
 git clone https://github.com/OPauloChagas/cashflow.git cd cashflow
 
-3. Configure o ambiente:
-- Certifique-se de ter as variáveis de ambiente configuradas para conectar aos serviços de banco de dados e RabbitMQ.
+2. Clone o repositório - API Gerador de Relatorio Consolidado
+
+https://github.com/OPauloChagas/cashflowreport
+
+3. Clone o repositório - Interface UI (React)
+
+https://github.com/OPauloChagas/cashflowfront
 
 ## **Rodando o Sistema**
 
 ### **Executar Localmente**
 
 1. Certifique-se de ter o .NET Core instalado.
-2. Compile o projeto:
 
-dotnet build
+2. Execute as migrações do banco de dados:
 
-3. Execute as migrações do banco de dados:
-
-dotnet ef database update
-
+Deixe somente uma solution inicializando [ Financial.CashFlow.API ]
+  --> Execute os commandos 
+      1 - add-Migration "primeira migration"
+      2 - update-database
+      
 5. Rode a aplicação:
 
 dotnet run
-
-
-### **Executar com Docker**
-
-1. Construa e suba os containers:
-
-docker-compose up --build
-
-
-2. Acesse a aplicação:
-- A API estará disponível em [http://localhost:5000](http://localhost:5000).
 
 ## **Testes Unitários**
 
@@ -147,3 +192,7 @@ Embora identificado a importância de implementar as seguintes funcionalidades, 
 - **API Gateway Ocelot:** Para roteamento e gerenciamento de chamadas entre serviços.
 
 Com isso, a solução demonstra não apenas a capacidade técnica de implementar uma arquitetura moderna, mas também um entendimento profundo dos princípios de design de software, essenciais para o sucesso em um ambiente de produção.
+
+## **UI Sistema**
+![image](https://github.com/user-attachments/assets/4a47acb5-8419-4ae0-8d4b-663c3642d465)
+
