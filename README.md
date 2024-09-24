@@ -92,7 +92,8 @@ Os microserviços usam **RabbitMQ** para mensageria assíncrona e persistem os d
 
 docker-compose up --build
 
-[Uploading docker-compose.yml…](services:
+```bash
+services:
   postgres:
     image: postgres:13
     environment:
@@ -122,7 +123,6 @@ docker-compose up --build
       - mongo-data:/data/db
     networks:
       - app-cashFlow
-
 networks:
   app-cashFlow:
     driver: bridge
@@ -130,7 +130,8 @@ networks:
 volumes:
   postgres-data:
   mongo-data:
-)
+
+```
 
 Serviços de Banco de dados e RabbitMQ
 
