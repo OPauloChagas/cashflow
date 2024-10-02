@@ -1,21 +1,56 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
+﻿.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
-/.vs/Financial.CashFlow.API/DesignTimeBuild
-/.vs/Financial.CashFlow.API/FileContentIndex
-/.vs/Financial.CashFlow.API/v17
-/.vs/ProjectEvaluation
-/Financeiro.CashFlow.Business/bin/Debug/net8.0
-/Financeiro.CashFlow.Business/obj
-/Financeiro.CashFlow.DataModels/bin/Debug/net8.0
-/Financeiro.CashFlow.DataModels/obj
-/Financeiro.CashFlow.Server/bin/Debug/net8.0
-/Financeiro.CashFlow.Server/obj
-/.vs/Financial.CashFlow.API/config
-/Financial.CashFlow.API/bin/Debug/net8.0
-/Financial.CashFlow.API/obj
-/Financial.CashFlow.Sdk/bin/Debug/net8.0
-/Financial.CashFlow.Sdk/obj
-/Financial.Cashflow.Tests/bin/Debug/net8.0
-/Financial.Cashflow.Tests/obj
+
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+
+
+*.dbmdl
+*.jfm
+.env
+appsettings*.json
+!appsettings.Development.json  # Keep specific configuration files, if needed
+appsettings*.local.json
+
+
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+packages/
+.nuget/
+
+.idea/
+
+*.log
+
+coverage/
+*.coverage
+*.coveragexml
+
+Generated/
+
+_ReSharper.Caches/
+
+# Ignore database migration files
+Migrations/
+
+# Ignore Docker files
+docker-compose.override.yml
+docker-compose.override.yaml
+docker-compose.debug.yml
+
+# Ignore any other folders that should not be in source control
+local.settings.json
+*.launch.json
+
+# Ignore testing-related files
+test-results/
