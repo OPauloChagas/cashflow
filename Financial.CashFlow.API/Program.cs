@@ -42,7 +42,6 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
 });
 
 builder.Services.AddSingleton<RabbitMQPublisher>();
-builder.Services.AddSingleton<RabbitMQConsumer>();
 
 builder.Services.AddGrpcSdk();
 builder.Services.AddGrpc();
