@@ -7,12 +7,12 @@ using Moq;
 
 namespace Financial.Cashflow.Tests
 {
-    public class LancamentoControllerTests
+    public class RegisterLaunchControllerTests
     {
         private readonly LancamentoController _controller;
         private readonly Mock<ISender> _mockSender;
 
-        public LancamentoControllerTests()
+        public RegisterLaunchControllerTests()
         {
             _mockSender = new Mock<ISender>();
             _controller = new LancamentoController(_mockSender.Object);
@@ -33,7 +33,7 @@ namespace Financial.Cashflow.Tests
         public async Task CriarLancamento_ValidCommand_ReturnsOkResult()
         {
             // Arrange
-            var command = new LancamentoCommand(
+            var command = new RegisterLaunchCommand(
                 Guid.NewGuid(),
                 "Credito",
                 100.0,
@@ -41,7 +41,7 @@ namespace Financial.Cashflow.Tests
                 "2023-09-21",
                 "5052"
             );
-            var response = new LancamentoResponse { Sucesso = true };
+            var response = new LaunchResponse { Success = true };
             _mockSender.Setup(s => s.Send(command, It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
             // Act
@@ -56,7 +56,7 @@ namespace Financial.Cashflow.Tests
         public async Task CriarLancamento_CommandFails_ReturnsBadRequest()
         {
             // Arrange
-            var command = new LancamentoCommand(
+            var command = new RegisterLaunchCommand(
                 Guid.NewGuid(),
                 "Debito",
                 1000.0,
@@ -64,7 +64,7 @@ namespace Financial.Cashflow.Tests
                 "2023-09-22",
                 "8681"
             );
-            var response = new LancamentoResponse { Sucesso = false, Mensagem = "Erro ao processar." };
+            var response = new LaunchResponse { Success = false, Message = "Erro ao processar." };
             _mockSender.Setup(s => s.Send(command, It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
             // Act
@@ -80,7 +80,7 @@ namespace Financial.Cashflow.Tests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var command = new AtualizarLancamentoCommand
+            var command = new UpdateLaunchCommand
             (
                  id,
                  "Debito",
@@ -90,7 +90,7 @@ namespace Financial.Cashflow.Tests
                  "Cliente123"
             );
 
-            var response = new LancamentoResponse { Sucesso = true, Mensagem = "Lançamento atualizado com sucesso!" };
+            var response = new LaunchResponse { Success = true, Message = "Lançamento atualizado com sucesso!" };
 
             _mockSender.Setup(s => s.Send(command, It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
@@ -99,7 +99,7 @@ namespace Financial.Cashflow.Tests
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result); 
-            Assert.Equal(response.Mensagem, okResult.Value);        
+            Assert.Equal(response.Message, okResult.Value);        
         }
 
 
@@ -108,7 +108,7 @@ namespace Financial.Cashflow.Tests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var command = new AtualizarLancamentoCommand
+            var command = new UpdateLaunchCommand
             (
                 Guid.NewGuid(), // ID diferente do 'id'
                 "Credito",
@@ -132,7 +132,7 @@ namespace Financial.Cashflow.Tests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var command = new AtualizarLancamentoCommand
+            var command = new UpdateLaunchCommand
             (
                 id,
                 "Credito",
@@ -142,8 +142,8 @@ namespace Financial.Cashflow.Tests
                 "Cliente123"
             );
 
-            _mockSender.Setup(s => s.Send(It.IsAny<AtualizarLancamentoCommand>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync((LancamentoResponse)null);
+            _mockSender.Setup(s => s.Send(It.IsAny<UpdateLaunchCommand>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync((LaunchResponse)null);
 
             // Act
             var result = await _controller.AtualizarLancamento(id, command);
@@ -158,7 +158,7 @@ namespace Financial.Cashflow.Tests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var command = new AtualizarLancamentoCommand
+            var command = new UpdateLaunchCommand
             (
                 id,
                 "Credito",
@@ -168,7 +168,7 @@ namespace Financial.Cashflow.Tests
                 "Cliente123"
             );
 
-            _mockSender.Setup(s => s.Send(It.IsAny<AtualizarLancamentoCommand>(), It.IsAny<CancellationToken>()))
+            _mockSender.Setup(s => s.Send(It.IsAny<UpdateLaunchCommand>(), It.IsAny<CancellationToken>()))
                        .ThrowsAsync(new ApplicationException("Erro ao atualizar o lançamento"));
 
             // Act
@@ -187,8 +187,8 @@ namespace Financial.Cashflow.Tests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var command = new DeletarLancamentoCommand(id);
-            var response = new DeletarLancamentoResponse { Sucesso = true, Mensagem = "Lançamento deletado com sucesso!" };
+            var command = new DeleteLaunchCommand(id);
+            var response = new DeleteLaunchResponse { Success = true, Message = "Lançamento deletado com sucesso!" };
 
             _mockSender.Setup(s => s.Send(command, It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
@@ -219,8 +219,8 @@ namespace Financial.Cashflow.Tests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var command = new DeletarLancamentoCommand(id);
-            var response = new DeletarLancamentoResponse { Sucesso = false, Mensagem = "Lançamento não encontrado." };
+            var command = new DeleteLaunchCommand(id);
+            var response = new DeleteLaunchResponse { Success = false, Message = "Lançamento não encontrado." };
 
             _mockSender.Setup(s => s.Send(command, It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
@@ -237,7 +237,7 @@ namespace Financial.Cashflow.Tests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var command = new DeletarLancamentoCommand(id);
+            var command = new DeleteLaunchCommand(id);
 
             _mockSender.Setup(s => s.Send(command, It.IsAny<CancellationToken>()))
                        .ThrowsAsync(new Exception("Erro ao deletar o lançamento"));

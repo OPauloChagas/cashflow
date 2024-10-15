@@ -8,53 +8,53 @@ using Moq;
 
 namespace Financial.Cashflow.Tests
 {
-    public class DeletarLancamentoCommandHandlerTests
+    public class DeleteLaunchCommandHandlerTests
     {
-        private readonly Mock<ILauchClient> _mockGrpcClient;
-        private readonly DeletarLancamentoCommandHandler _handler;
-        private readonly Mock<ILogger<DeletarLancamentoCommandHandler>> _mockLogger;
+        private readonly Mock<ILaunchClient> _mockGrpcClient;
+        private readonly DeleteLaunchCommandHandler _handler;
+        private readonly Mock<ILogger<DeleteLaunchCommandHandler>> _mockLogger;
 
-        public DeletarLancamentoCommandHandlerTests()
+        public DeleteLaunchCommandHandlerTests()
         {
-            _mockLogger = new Mock<ILogger<DeletarLancamentoCommandHandler>>();
-            _mockGrpcClient = new Mock<ILauchClient>();
-            _handler = new DeletarLancamentoCommandHandler(_mockGrpcClient.Object, _mockLogger.Object);
+            _mockLogger = new Mock<ILogger<DeleteLaunchCommandHandler>>();
+            _mockGrpcClient = new Mock<ILaunchClient>();
+            _handler = new DeleteLaunchCommandHandler(_mockGrpcClient.Object, _mockLogger.Object);
         }
 
         [Fact]
         public async Task Handle_DeletarLancamentoGrpcServiceReturnsSuccess_ReturnsSuccessResponse()
         {
             // Arrange
-            var command = new DeletarLancamentoCommand(Guid.NewGuid()); 
+            var command = new DeleteLaunchCommand(Guid.NewGuid()); 
 
-            var grpcResponse = new DeletarLancamentoResponse
+            var grpcResponse = new DeleteLaunchResponse
             {
-                Sucesso = true,
-                Mensagem = "Lançamento deletado com sucesso!"
+                Success = true,
+                Message = "Lançamento deletado com sucesso!"
             };
 
             // Simulando a chamada gRPC com sucesso
             _mockGrpcClient
-                .Setup(client => client.DeletarLancamentoAsync(It.IsAny<LancamentoIdRequest>(), It.IsAny<CancellationToken>()))
+                .Setup(client => client.DeleteLaunchAsync(It.IsAny<LaunchIdRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(grpcResponse);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            Assert.True(result.Sucesso);
-            Assert.Equal("Lançamento deletado com sucesso!", result.Mensagem);
+            Assert.True(result.Success);
+            Assert.Equal("Lançamento deletado com sucesso!", result.Message);
         }
 
         [Fact]
         public async Task Handle_DeletarLancamentoGrpcServiceThrowsRpcException_ThrowsApplicationException()
         {
             // Arrange
-            var command = new DeletarLancamentoCommand(Guid.NewGuid()); 
+            var command = new DeleteLaunchCommand(Guid.NewGuid()); 
 
             // Simulando a exceção RpcException
             _mockGrpcClient
-                .Setup(client => client.DeletarLancamentoAsync(It.IsAny<LancamentoIdRequest>(), It.IsAny<CancellationToken>()))
+                .Setup(client => client.DeleteLaunchAsync(It.IsAny<LaunchIdRequest>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new RpcException(new Status(StatusCode.Internal, "gRPC error")));
 
             // Act & Assert

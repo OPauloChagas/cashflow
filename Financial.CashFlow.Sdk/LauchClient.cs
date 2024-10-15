@@ -4,14 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Financial.CashFlow.Sdk
 {
-    public class LauchClient : ILauchClient
+    public class LauchClient : ILaunchClient
     {
         #region Dependencies
 
-        private readonly LancamentoService.LancamentoServiceClient _lancamentoClient;
+        private readonly LaunchRegisterService.LaunchRegisterServiceClient _lancamentoClient;
         private readonly ILogger<LauchClient> _logger;
 
-        public LauchClient(LancamentoService.LancamentoServiceClient lancamentoClient, ILogger<LauchClient> logger)
+        public LauchClient(LaunchRegisterService.LaunchRegisterServiceClient lancamentoClient, ILogger<LauchClient> logger)
         {
             _lancamentoClient = lancamentoClient;
             _logger = logger;
@@ -19,11 +19,11 @@ namespace Financial.CashFlow.Sdk
 
         #endregion END Dependencies
 
-        public async Task<LancamentoResponse> AtualizarLancamentoAsync(LancamentoRequest request, CancellationToken cancellationToken)
+        public async Task<LaunchResponse> UpdateLaunchAsync(LaunchRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var response = await _lancamentoClient.AtualizarLancamentoAsync(request, null, null, cancellationToken);
+                var response = await _lancamentoClient.UpdateLaunchAsync(request, null, null, cancellationToken);
                 return response;
             }
             catch (RpcException rpcEx)
@@ -38,12 +38,12 @@ namespace Financial.CashFlow.Sdk
             }
         }
 
-        public async Task<DeletarLancamentoResponse> DeletarLancamentoAsync(LancamentoIdRequest request, CancellationToken cancellationToken)
+        public async Task<DeleteLaunchResponse> DeleteLaunchAsync(LaunchIdRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 // Tenta deletar via gRPC
-                var response = await _lancamentoClient.DeletarLancamentoAsync(request, null, null, cancellationToken);
+                var response = await _lancamentoClient.DeleteLaunchAsync(request, null, null, cancellationToken);
                 return response;
             }
             catch (RpcException rpcEx)
@@ -58,11 +58,11 @@ namespace Financial.CashFlow.Sdk
             }
         }
 
-        public async Task<LancamentoResponse> RegistrarLancamentoAsync(LancamentoRequest request, CancellationToken cancellationToken)
+        public async Task<LaunchResponse> RegisterLaunchAsync(LaunchRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var response = await _lancamentoClient.RegistrarLancamentoAsync(request, null, null, cancellationToken);
+                var response = await _lancamentoClient.RegisterLaunchAsync(request, null, null, cancellationToken);
                 return response;
             }
             catch (RpcException rpcEx)

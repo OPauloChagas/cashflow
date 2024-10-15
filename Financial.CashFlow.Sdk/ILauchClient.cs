@@ -2,10 +2,11 @@
 
 namespace Financial.CashFlow.Sdk
 {
-    public interface ILauchClient
+    public interface ILaunchClient
     {
-        Task<LancamentoResponse> RegistrarLancamentoAsync(LancamentoRequest request, CancellationToken cancellationToken);
-        Task<LancamentoResponse> AtualizarLancamentoAsync(LancamentoRequest request, CancellationToken cancellationToken);
-        Task<DeletarLancamentoResponse> DeletarLancamentoAsync(LancamentoIdRequest request, CancellationToken cancellationToken);
+        Task<LaunchResponse> RegisterLaunchAsync(LaunchRequest request, CancellationToken cancellationToken);
+        Task<LaunchResponse> UpdateLaunchAsync(LaunchRequest request, CancellationToken cancellationToken);
+        Task<DeleteLaunchResponse> DeleteLaunchAsync(LaunchIdRequest request, CancellationToken cancellationToken);
     }
+
 }

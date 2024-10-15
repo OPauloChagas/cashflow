@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Financeiro.CashFlow.Business.Commands
 {
-    public record DeletarLancamentoCommand(Guid Id) : IRequest<DeletarLancamentoResponse>;
+    public record DeleteLaunchCommand(Guid Id) : IRequest<DeleteLaunchResponse>;
 }

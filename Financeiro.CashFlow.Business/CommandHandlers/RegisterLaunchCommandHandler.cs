@@ -8,16 +8,16 @@ using Newtonsoft.Json;
 
 namespace Financeiro.CashFlow.Business.CommandHandlers
 {
-    public class LancamentoCommandHandler : IRequestHandler<LancamentoCommand, LancamentoResponse>
+    public class RegisterLaunchCommandHandler : IRequestHandler<RegisterLaunchCommand, LaunchResponse>
     {
         #region Dependencies
 
-        private readonly ILauchClient _lauchClient;
-        private readonly ILogger<LancamentoCommandHandler> _logger;
+        private readonly ILaunchClient _lauchClient;
+        private readonly ILogger<RegisterLaunchCommandHandler> _logger;
         private readonly RabbitMQPublisher _rabbitMQPublisher;
 
-        public LancamentoCommandHandler(ILauchClient lauchClient
-                                      , ILogger<LancamentoCommandHandler> logger
+        public RegisterLaunchCommandHandler(ILaunchClient lauchClient
+                                      , ILogger<RegisterLaunchCommandHandler> logger
                                       , RabbitMQPublisher rabbitMQPublisher)
         {
             _lauchClient = lauchClient;
@@ -27,31 +27,31 @@ namespace Financeiro.CashFlow.Business.CommandHandlers
 
         #endregion END Dependencies
 
-        public async Task<LancamentoResponse> Handle(LancamentoCommand request, CancellationToken cancellationToken)
+        public async Task<LaunchResponse> Handle(RegisterLaunchCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 
-                var grpcRequest = new LancamentoRequest
+                var grpcRequest = new LaunchRequest
                 {
                     Id = request.Id.ToString(),
-                    Tipo = request.Tipo,
-                    Valor = request.Valor,
-                    Descricao = request.Descricao,
-                    Data = request.Data,
-                    ClienteId = request.ClienteId
+                    Type = request.Tipo,
+                    Value = request.Valor,
+                    Description = request.Descricao,
+                    Date = request.Data,
+                    ClientId = request.ClienteId
                 };
 
-                var grpcResponse = await _lauchClient.RegistrarLancamentoAsync(grpcRequest, cancellationToken);
+                var grpcResponse = await _lauchClient.RegisterLaunchAsync(grpcRequest, cancellationToken);
 
                 var message = JsonConvert.SerializeObject(request);
                 _rabbitMQPublisher.PublishMessage("queue_consolidacao_diaria", message);
 
-                return new LancamentoResponse
+                return new LaunchResponse
                 {
                     Id = grpcResponse.Id,
-                    Sucesso = grpcResponse.Sucesso,
-                    Mensagem = grpcResponse.Mensagem
+                    Success = grpcResponse.Success,
+                    Message = grpcResponse.Message
                 };
             }
             catch (RpcException rpcEx)

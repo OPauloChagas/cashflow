@@ -9,31 +9,31 @@ using Moq;
 
 namespace Financial.Cashflow.Tests
 {
-    public class LancamentoCommandHandlerTests
+    public class RegisterLaunchCommandHandlerTests
     {
-        private readonly Mock<ILauchClient> _mockGrpcClient;
-        private readonly LancamentoCommandHandler _handler;
-        private readonly Mock<ILogger<LancamentoCommandHandler>> _mockLogger;
+        private readonly Mock<ILaunchClient> _mockGrpcClient;
+        private readonly RegisterLaunchCommandHandler _handler;
+        private readonly Mock<ILogger<RegisterLaunchCommandHandler>> _mockLogger;
         private readonly Mock<RabbitMQPublisher> _mockRabbitMQPublisher;
 
-        public LancamentoCommandHandlerTests()
+        public RegisterLaunchCommandHandlerTests()
         {
-            _mockLogger = new Mock<ILogger<LancamentoCommandHandler>>();
-            _mockGrpcClient = new Mock<ILauchClient>();
+            _mockLogger = new Mock<ILogger<RegisterLaunchCommandHandler>>();
+            _mockGrpcClient = new Mock<ILaunchClient>();
             _mockRabbitMQPublisher = new Mock<RabbitMQPublisher>();
 
             _mockRabbitMQPublisher
               .Setup(p => p.PublishMessage(It.IsAny<string>(), It.IsAny<string>()))
               .Verifiable();
 
-            _handler = new LancamentoCommandHandler(_mockGrpcClient.Object, _mockLogger.Object, _mockRabbitMQPublisher.Object);
+            _handler = new RegisterLaunchCommandHandler(_mockGrpcClient.Object, _mockLogger.Object, _mockRabbitMQPublisher.Object);
         }
 
         [Fact]
         public async Task Handle_ValidCommand_ReturnsSuccessResponse()
         {
             // Arrange
-            var command = new LancamentoCommand(
+            var command = new RegisterLaunchCommand(
                 Guid.NewGuid(),
                 "Credito",
                 100.0,
@@ -42,16 +42,16 @@ namespace Financial.Cashflow.Tests
                 "Cliente123"
             );
 
-            var grpcResponse = new LancamentoResponse { Sucesso = true };
+            var grpcResponse = new LaunchResponse { Success = true };
 
-            _mockGrpcClient.Setup(client => client.RegistrarLancamentoAsync(It.IsAny<LancamentoRequest>(), It.IsAny<CancellationToken>()))
+            _mockGrpcClient.Setup(client => client.RegisterLaunchAsync(It.IsAny<LaunchRequest>(), It.IsAny<CancellationToken>()))
                            .ReturnsAsync(grpcResponse);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            Assert.True(result.Sucesso);
+            Assert.True(result.Success);
             _mockRabbitMQPublisher.Verify(p => p.PublishMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -59,7 +59,7 @@ namespace Financial.Cashflow.Tests
         public async Task Handle_GrpcServiceThrowsRpcException_ThrowsApplicationException()
         {
             // Arrange
-            var command = new LancamentoCommand(
+            var command = new RegisterLaunchCommand(
                 Guid.NewGuid(),
                 "Credito",
                 100.0,
@@ -67,7 +67,7 @@ namespace Financial.Cashflow.Tests
                 "2023-09-21",
                 "Cliente123"
             );
-            _mockGrpcClient.Setup(client => client.RegistrarLancamentoAsync(It.IsAny<LancamentoRequest>(), It.IsAny<CancellationToken>()))
+            _mockGrpcClient.Setup(client => client.RegisterLaunchAsync(It.IsAny<LaunchRequest>(), It.IsAny<CancellationToken>()))
                            .ThrowsAsync(new RpcException(new Status(StatusCode.Internal, "gRPC error")));
 
             // Act & Assert

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Financial.Cashflow.Tests
 {
-    public class DeletarControllerTests
+    public class DeleteControllerTests
     {
     }
 }

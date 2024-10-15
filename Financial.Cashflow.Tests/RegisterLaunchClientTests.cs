@@ -3,21 +3,21 @@ using Financial.CashFlow.Sdk;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Moq;
-using static Financeiro.CashFlow.Server.LancamentoService;
+using static Financeiro.CashFlow.Server.LaunchRegisterService;
 
 namespace Financial.Cashflow.Tests
 {
-    public class LancamentoClientTests
+    public class RegisterLaunchClientTests
     {
-        private readonly Mock<LancamentoServiceClient> _mockGrpcClient;
+        private readonly Mock<LaunchRegisterServiceClient> _mockGrpcClient;
         private readonly LauchClient _client;
         private readonly Mock<ILogger<LauchClient>> _mockLogger;
 
-        public LancamentoClientTests()
+        public RegisterLaunchClientTests()
         {
             
             _mockLogger = new Mock<ILogger<LauchClient>>();
-            _mockGrpcClient = new Mock<LancamentoServiceClient>();
+            _mockGrpcClient = new Mock<LaunchRegisterServiceClient>();
             _client = new LauchClient(_mockGrpcClient.Object, _mockLogger.Object);
         }
 
@@ -25,25 +25,25 @@ namespace Financial.Cashflow.Tests
         public async Task RegistrarLancamentoAsync_GrpcServiceReturnsValidResponse_ReturnsSuccess()
         {
             // Arrange
-            var request = new LancamentoRequest
+            var request = new LaunchRequest
             {
                 Id = Guid.NewGuid().ToString(),
-                Tipo = "Credito",
-                Valor = 100.0,
-                Descricao = "Pagamento",
-                Data = "2024-09-14T00:00:00Z",
-                ClienteId = "Cliente123"
+                Type = "Credito",
+                Value = 100.0,
+                Description = "Pagamento",
+                Date = "2024-09-14T00:00:00Z",
+                ClientId = "Cliente123"
             };
 
-            var response = new LancamentoResponse
+            var response = new LaunchResponse
             {
                 Id = request.Id,
-                Sucesso = true,
-                Mensagem = "Lançamento registrado com sucesso!"
+                Success = true,
+                Message = "Lançamento registrado com sucesso!"
             };
 
             // Simulando uma chamada gRPC com sucesso
-            var asyncUnaryCall = new AsyncUnaryCall<LancamentoResponse>(
+            var asyncUnaryCall = new AsyncUnaryCall<LaunchResponse>(
                 Task.FromResult(response),
                 Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
@@ -52,34 +52,34 @@ namespace Financial.Cashflow.Tests
             );
 
             _mockGrpcClient
-                .Setup(client => client.RegistrarLancamentoAsync(It.IsAny<LancamentoRequest>(), null, null, It.IsAny<CancellationToken>()))
+                .Setup(client => client.RegisterLaunchAsync(It.IsAny<LaunchRequest>(), null, null, It.IsAny<CancellationToken>()))
                 .Returns(asyncUnaryCall);
 
             // Act
-            var result = await _client.RegistrarLancamentoAsync(request, CancellationToken.None);
+            var result = await _client.RegisterLaunchAsync(request, CancellationToken.None);
 
             // Assert
-            Assert.True(result.Sucesso);
-            Assert.Equal("Lançamento registrado com sucesso!", result.Mensagem);
+            Assert.True(result.Success);
+            Assert.Equal("Lançamento registrado com sucesso!", result.Message);
         }
 
         [Fact]
         public async Task RegistrarLancamentoAsync_GrpcServiceThrowsRpcException_ThrowsApplicationException()
         {
             // Arrange
-            var request = new LancamentoRequest
+            var request = new LaunchRequest
             {
                 Id = Guid.NewGuid().ToString(),
-                Tipo = "Credito",
-                Valor = 100.0,
-                Descricao = "Pagamento",
-                Data = "2024-09-14T00:00:00Z",
-                ClienteId = "Cliente123"
+                Type = "Credito",
+                Value = 100.0,
+                Description = "Pagamento",
+                Date = "2024-09-14T00:00:00Z",
+                ClientId = "Cliente123"
             };
 
             // Configurando o mock do AsyncUnaryCall para lançar uma exceção RpcException
-            var asyncUnaryCall = new AsyncUnaryCall<LancamentoResponse>(
-                Task.FromException<LancamentoResponse>(new RpcException(new Status(StatusCode.Internal, "gRPC error"))),
+            var asyncUnaryCall = new AsyncUnaryCall<LaunchResponse>(
+                Task.FromException<LaunchResponse>(new RpcException(new Status(StatusCode.Internal, "gRPC error"))),
                 Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
                 () => new Metadata(),
@@ -87,11 +87,11 @@ namespace Financial.Cashflow.Tests
             );
 
             _mockGrpcClient
-                .Setup(client => client.RegistrarLancamentoAsync(It.IsAny<LancamentoRequest>(), null, null, It.IsAny<CancellationToken>()))
+                .Setup(client => client.RegisterLaunchAsync(It.IsAny<LaunchRequest>(), null, null, It.IsAny<CancellationToken>()))
                 .Returns(asyncUnaryCall);
 
             // Act & Assert
-            var ex = await Assert.ThrowsAsync<ApplicationException>(() => _client.RegistrarLancamentoAsync(request, CancellationToken.None));
+            var ex = await Assert.ThrowsAsync<ApplicationException>(() => _client.RegisterLaunchAsync(request, CancellationToken.None));
 
             // Verificando se a mensagem da exceção está correta
             Assert.Equal("Erro ao registrar lançamento", ex.Message);

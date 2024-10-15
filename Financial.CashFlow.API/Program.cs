@@ -25,9 +25,9 @@ builder.Services.AddDbContext<LancamentoAppDbContext>(options =>
 
 // Configuração do MediatR para os Command Handlers
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
-    typeof(LancamentoCommandHandler).Assembly,
-    typeof(DeletarLancamentoCommandHandler).Assembly,
-    typeof(AtualizarLancamentoCommandHandler).Assembly
+    typeof(RegisterLaunchCommandHandler).Assembly,
+    typeof(DeleteLaunchCommandHandler).Assembly,
+    typeof(UpdateLaunchCommandHandler).Assembly
 ));
 
 builder.Services.AddSingleton<IConnectionFactory>(sp =>

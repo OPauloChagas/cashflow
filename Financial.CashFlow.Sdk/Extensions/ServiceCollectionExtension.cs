@@ -8,12 +8,12 @@ namespace Financial.CashFlow.Sdk.Extensions
     {
         public static void AddGrpcSdk(this IServiceCollection services)
         {
-            services.AddGrpcClient<LancamentoService.LancamentoServiceClient>(client =>
+            services.AddGrpcClient<LaunchRegisterService.LaunchRegisterServiceClient>(client =>
             {
                 client.Address = new Uri("https://localhost:7191");
             });
 
-            services.AddScoped<ILauchClient, LauchClient>();
+            services.AddScoped<ILaunchClient, LauchClient>();
         }
     }
 }

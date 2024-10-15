@@ -18,7 +18,7 @@ namespace Financial.CashFlow.API.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<LancamentoResponse>> CriarLancamento(LancamentoCommand command)
+        public async Task<ActionResult<LaunchResponse>> CriarLancamento(RegisterLaunchCommand command)
         {
             if (command == null)
             {
@@ -29,9 +29,9 @@ namespace Financial.CashFlow.API.Controllers
             {
                 var lancamentoResponse = await _sender.Send(command);
 
-                if (!lancamentoResponse.Sucesso)
+                if (!lancamentoResponse.Success)
                 {
-                    return BadRequest(lancamentoResponse.Mensagem);
+                    return BadRequest(lancamentoResponse.Message);
                 }
 
                 return Ok(lancamentoResponse);
@@ -43,22 +43,22 @@ namespace Financial.CashFlow.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<DeletarLancamentoResponse>> DeletarLancamento(Guid id)
+        public async Task<ActionResult<DeleteLaunchResponse>> DeletarLancamento(Guid id)
         {
             if (id == Guid.Empty)
             {
                 return BadRequest("Id do lançamento não pode ser vazio.");
             }
 
-            var command = new DeletarLancamentoCommand(id);
+            var command = new DeleteLaunchCommand(id);
 
             try
             {
                 var result = await _sender.Send(command);
 
-                if (!result.Sucesso)
+                if (!result.Success)
                 {
-                    return NotFound(result.Mensagem);
+                    return NotFound(result.Message);
                 }
 
                 return Ok(result);
@@ -70,7 +70,7 @@ namespace Financial.CashFlow.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> AtualizarLancamento(Guid id, AtualizarLancamentoCommand command)
+        public async Task<ActionResult> AtualizarLancamento(Guid id, UpdateLaunchCommand command)
         {
             if (id != command.Id)
             {
@@ -86,9 +86,9 @@ namespace Financial.CashFlow.API.Controllers
                     return NotFound("Lançamento não encontrado.");
                 }
 
-                if (result.Sucesso)
+                if (result.Success)
                 {
-                    return Ok(result.Mensagem);
+                    return Ok(result.Message);
                 }
 
                 return BadRequest("Erro ao atualizar o lançamento.");

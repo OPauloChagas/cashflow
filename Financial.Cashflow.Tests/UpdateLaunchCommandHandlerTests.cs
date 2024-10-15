@@ -8,24 +8,24 @@ using Moq;
 
 namespace Financial.Cashflow.Tests
 {
-    public class AtualizarLancamentoCommandHandlerTests
+    public class UpdateLaunchCommandHandlerTests
     {
-        private readonly Mock<ILauchClient> _mockGrpcClient;
-        private readonly AtualizarLancamentoCommandHandler _handler;
-        private readonly Mock<ILogger<AtualizarLancamentoCommandHandler>> _mockLogger;
+        private readonly Mock<ILaunchClient> _mockGrpcClient;
+        private readonly UpdateLaunchCommandHandler _handler;
+        private readonly Mock<ILogger<UpdateLaunchCommandHandler>> _mockLogger;
 
-        public AtualizarLancamentoCommandHandlerTests()
+        public UpdateLaunchCommandHandlerTests()
         {
-            _mockLogger = new Mock<ILogger<AtualizarLancamentoCommandHandler>>();
-            _mockGrpcClient = new Mock<ILauchClient>();
-            _handler = new AtualizarLancamentoCommandHandler(_mockGrpcClient.Object, _mockLogger.Object);
+            _mockLogger = new Mock<ILogger<UpdateLaunchCommandHandler>>();
+            _mockGrpcClient = new Mock<ILaunchClient>();
+            _handler = new UpdateLaunchCommandHandler(_mockGrpcClient.Object, _mockLogger.Object);
         }
 
         [Fact]
         public async Task Handle_AtualizarLancamentoGrpcServiceReturnsSuccess_ReturnsSuccessResponse()
         {
             // Arrange
-            var command = new AtualizarLancamentoCommand
+            var command = new UpdateLaunchCommand
             (
                 Guid.NewGuid(),
                 "Debito",
@@ -35,31 +35,31 @@ namespace Financial.Cashflow.Tests
                 "Cliente456"
             );
 
-            var grpcResponse = new LancamentoResponse
+            var grpcResponse = new LaunchResponse
             {
                 Id = command.Id.ToString(),
-                Sucesso = true,
-                Mensagem = "Lançamento atualizado com sucesso!"
+                Success = true,
+                Message = "Lançamento atualizado com sucesso!"
             };
 
             // Simulando a chamada gRPC com sucesso
             _mockGrpcClient
-                .Setup(client => client.AtualizarLancamentoAsync(It.IsAny<LancamentoRequest>(), It.IsAny<CancellationToken>()))
+                .Setup(client => client.UpdateLaunchAsync(It.IsAny<LaunchRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(grpcResponse);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            Assert.True(result.Sucesso);
-            Assert.Equal("Lançamento atualizado com sucesso", result.Mensagem);
+            Assert.True(result.Success);
+            Assert.Equal("Lançamento atualizado com sucesso", result.Message);
         }
 
         [Fact]
         public async Task Handle_AtualizarLancamentoGrpcServiceThrowsRpcException_ThrowsApplicationException()
         {
             // Arrange
-            var command = new AtualizarLancamentoCommand
+            var command = new UpdateLaunchCommand
             (
                  Guid.NewGuid(),
                 "Debito",
@@ -71,7 +71,7 @@ namespace Financial.Cashflow.Tests
 
             // Simulando a exceção RpcException
             _mockGrpcClient
-                .Setup(client => client.AtualizarLancamentoAsync(It.IsAny<LancamentoRequest>(), It.IsAny<CancellationToken>()))
+                .Setup(client => client.UpdateLaunchAsync(It.IsAny<LaunchRequest>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new RpcException(new Status(StatusCode.Internal, "gRPC error")));
 
             // Act & Assert
